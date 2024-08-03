@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { SimpleService } from './simple.service';
+import { Message } from './models/message.model';
 
 @Component({
   selector: 'app-root',
@@ -14,8 +15,8 @@ export class AppComponent {
 
   onClick() {
     this._simpleService.getHelloWorld().subscribe({
-      next: (res) => {
-        this.text = res;
+      next: (res: Message) => {
+        this.text = res.text;
       },
       error: (err) => {
         this.text = err;

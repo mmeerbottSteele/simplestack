@@ -1,10 +1,9 @@
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
 
 namespace backend.Controllers;
 
-[Route("hello")]
+[Route("api/hello")]
 [ApiController]
 public class SimpleController : ControllerBase
 {
@@ -17,7 +16,7 @@ public class SimpleController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetMessage()
     {
-        List<Message> messages = _service.GetMessages();
-        return Ok(messages);
+        Message msg = _service.GetMessages().First();
+        return Ok(msg);
     }
 }
