@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  angular:
+    image: angular
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    ports:
+      - 4200:80
+    links: dotnet
+
+  dotnet:
+    image: dotnet
+    build:
+      context: ./api
+      dockerfile: ./Dockerfile
+    ports:
+      - 12287:12287
