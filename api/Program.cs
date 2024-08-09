@@ -12,11 +12,22 @@ builder.Services.AddScoped<SimpleService>();
 // for entity framework
 if (builder.Configuration["DatabaseType"] == "mysql")
 {
-    string connectionString = builder.Configuration.GetConnectionString("mysql") ?? "";
-    var serverVersion = ServerVersion.AutoDetect(connectionString);
+    // string connectionString = builder.Configuration.GetConnectionString("mysql") ?? "";
+    string connStr = Environment.GetEnvironmentVariable("CONNECTIONS__DEFAULT") ?? "";
+    if (connStr == "") {
+        connStr = builder.Configuration.GetConnectionString("mysql") ?? "";
+    }
 
-    builder.Services.AddDbContext<SimpleDbContext>(options =>
-        options.UseMySql(connectionString, serverVersion));
+    try
+    {
+        var serverVersion = ServerVersion.AutoDetect(connStr);
+        builder.Services.AddDbContext<SimpleDbContext>(options =>
+            options.UseMySql(connStr, serverVersion));
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Failed to connect to the database ({connStr}): {ex.Message}");
+    }
 }
 
 builder.Services.AddControllers();

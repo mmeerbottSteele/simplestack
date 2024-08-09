@@ -1,19 +1,42 @@
 version: '3.4'
 
 services:
-  angular:
+  frontend:
     image: angular
+    container_name: Angular
     build:
       context: ./frontend
       dockerfile: ./Dockerfile
     ports:
       - 4200:80
-    links: dotnet
+    links: 
+      - backend
 
-  dotnet:
+  backend:
     image: dotnet
+    container_name: Dotnet
     build:
       context: ./api
       dockerfile: ./Dockerfile
     ports:
       - 12287:12287
+    links: 
+      - database
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=mysqldb;Database=training;User=root;Password=Password123;
+
+  database:
+    image: mysql:8.0
+    container_name: mysqldb
+    environment:
+      - MYSQL_ROOT_PASSWORD=Password123
+      - MYSQL_DATABASE=training
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./api/docker-files/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+
+volumes:
+  db-data:

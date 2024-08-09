@@ -1,13 +1,12 @@
-FROM node:16.10 as node
+FROM node:16.10 as build
 
-WORKDIR /app
-COPY . .
+WORKDIR /usr/local/app
+COPY ./ /usr/local/app/
 
-RUN npm install -g @angular/cli 
 RUN npm i 
 RUN npm run build --prod
 
 FROM nginx:latest
-COPY --from=node /app/dist/api-training /usr/share/nginx/html
+COPY --from=build /usr/local/app/dist/api-training /usr/share/nginx/html
 EXPOSE 4200
 

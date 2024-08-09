@@ -11,14 +11,14 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 12287:12287
-    depends_on:
-      - db
+    links: 
+      - database
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=training;User=root;Password=Password123;
+      - CONNECTIONS__DEFAULT=Server=database;Database=training;User=root;Password=Password123;
 
 
-  db:
+  database:
     image: mysql:8.0
     container_name: mysqldb
     environment:
