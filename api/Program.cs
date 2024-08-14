@@ -13,9 +13,10 @@ builder.Services.AddScoped<SimpleService>();
 if (builder.Configuration["DatabaseType"] == "mysql")
 {
     // string connectionString = builder.Configuration.GetConnectionString("mysql") ?? "";
-    string connStr = Environment.GetEnvironmentVariable("CONNECTIONS__DEFAULT") ?? "";
+    string connStr = Environment.GetEnvironmentVariable("CONNECTIONS_DEFAULT") ?? "";
     if (connStr == "") {
         connStr = builder.Configuration.GetConnectionString("mysql") ?? "";
+        Console.WriteLine("Defaulted to builder config.");
     }
 
     try
@@ -27,6 +28,7 @@ if (builder.Configuration["DatabaseType"] == "mysql")
     catch (Exception ex)
     {
         Console.WriteLine($"Failed to connect to the database ({connStr}): {ex.Message}");
+        return;
     }
 }
 

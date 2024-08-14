@@ -9,26 +9,30 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 4200:80
-    links: 
+    depends_on: 
       - backend
 
   backend:
     image: dotnet
     container_name: Dotnet
+    networks:
+      - apitraining
     build:
       context: ./api
       dockerfile: ./Dockerfile
     ports:
       - 12287:12287
-    links: 
+    depends_on: 
       - database
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=mysqldb;Database=training;User=root;Password=Password123;
+      - CONNECTIONS_DEFAULT=server=database;database=training;uid=root;pwd=Password123;
 
   database:
     image: mysql:8.0
     container_name: mysqldb
+    networks:
+      - apitraining
     environment:
       - MYSQL_ROOT_PASSWORD=Password123
       - MYSQL_DATABASE=training
@@ -40,3 +44,6 @@ services:
 
 volumes:
   db-data:
+
+networks:
+  apitraining:
