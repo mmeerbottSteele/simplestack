@@ -4,19 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("Environment: " + Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
+// normally the config is set using the env but there is only 1 for now
 
 // Add services to the container.
-
 builder.Services.AddScoped<SimpleService>();
 
 // for entity framework
 if (builder.Configuration["DatabaseType"] == "mysql")
 {
-    // string connectionString = builder.Configuration.GetConnectionString("mysql") ?? "";
-    string connStr = Environment.GetEnvironmentVariable("CONNECTIONS_DEFAULT") ?? "";
+    string connStr = builder.Configuration.GetConnectionString("mysql") ?? "";
     if (connStr == "") {
-        connStr = builder.Configuration.GetConnectionString("mysql") ?? "";
-        Console.WriteLine("Defaulted to builder config.");
+        connStr = Environment.GetEnvironmentVariable("CONNECTIONS_DEFAULT") ?? "";
+        Console.WriteLine("Defaulted to Docker's config.");
     }
 
     try
