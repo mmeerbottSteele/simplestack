@@ -1,24 +1,23 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
-EXPOSE 5001
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Development
-WORKDIR /src
-COPY ["backend.csproj", "."]
-RUN dotnet restore "./backend.csproj"
+# Copy csproj and restore as distinct layers
+COPY *.csproj ./
+RUN dotnet restore
 
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "./backend.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Copy everything else and build
+COPY ./ ./
+RUN dotnet publish -c Release -o out
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./backend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build-env /app/out .
+ENV ASPNETCORE_ENVIRONMENT=Production
+EXPOSE 80
+EXPOSE 8080
+ARG ENVIRONMENT=Development
+ENV ASPNETCORE_ENVIRONMENT=$ENVIRONMENT
+RUN echo $ENVIRONMENT
 ENTRYPOINT ["dotnet", "backend.dll"]
 
